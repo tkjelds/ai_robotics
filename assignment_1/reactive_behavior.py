@@ -14,11 +14,6 @@ leftWheel = Motor(Port.E, Direction.COUNTERCLOCKWISE)
 
 robot = DriveBase(leftWheel, rightWheel, wheel_diameter=55, axle_track=115)
 
-class Detection:
-    EDGE = 1
-    OBSTACLE = 2
-    CLEAR = 3
-
 def printSensors(Detection_vec):
     print("Left: ", end="")
     printDetection(Detection_vec[0])
@@ -35,13 +30,49 @@ def printDetection(detection):
     elif detection == Detection.CLEAR:
         print("Clear")
 
-def epsilonGreedy(chance = 5):
-    print("Epsilon Greedy: ", end="")
-    return randint(1,100) < chance 
+def printDirection(direction):
+    if direction == Direction.LEFT:
+        print("Left")
+    elif direction == Direction.RIGHT:
+        print("Right")
+
+class Detection:
+    EDGE = 1
+    OBSTACLE = 2
+    CLEAR = 3
+
+class Direction:
+    LEFT = 0
+    RIGHT = 2
+
+def opposite(direction):
+    if direction == Direction.LEFT:
+        return Direction.RIGHT
+    elif direction == Direction.RIGHT:
+        return Direction.LEFT
+
+
+def epsilonGreedy(chance = 1):
+    return randint(1,100) <= chance 
+
+def exploreTurn(sen_vec, degrees = 90, direction = Direction.RIGHT):
+    turned = 0
+    while (sen_vec[direction] == Detection.CLEAR and turned < degrees):
+        if turned > 10 and sen_vec[opposite(direction)] == Detection.EDGE:
+            break
+        turn(1,direction)
+        sen_vec = getDetectionVec()
+        turned += 1
 
 def brakeWheels():
     leftWheel.hold()
     rightWheel.hold()
+
+def turn(degrees, direction):
+    if direction == Direction.RIGHT:
+        turnRight(degrees)
+    elif direction == Direction.LEFT:
+        turnLeft(degrees)
 
 def turnRight(degrees):
     rightWheel.dc(-50)
@@ -58,11 +89,17 @@ robot.settings(500,1000,500,500)
 
 Detection_vec = [Detection.CLEAR,Detection.CLEAR,Detection.CLEAR]
 
-def normalizeMiddle(x):
-    return Detection.OBSTACLE if x > 0 else Detection.CLEAR
+def normalizeMiddle(value):
+    return Detection.OBSTACLE if value > 0 else Detection.CLEAR
 
-def normalizeSides(x):
-    return Detection.CLEAR if x > 1 else Detection.EDGE
+def normalizeSides(value):
+    return Detection.CLEAR if value > 1 else Detection.EDGE
+
+def getDetectionVec():
+    LeftDetection = normalizeSides(sensorLeft.reflection())
+    MiddleDetection = normalizeMiddle(sensorMiddle.reflection())
+    RightDetection = normalizeSides(sensorRight.reflection())
+    return [LeftDetection, MiddleDetection, RightDetection]
 
 def behavior(Detection_vec):
     sense = Detection_vec
@@ -71,15 +108,16 @@ def behavior(Detection_vec):
         robot.straight(20,wait=False)
     elif (sense == [Detection.EDGE, Detection.CLEAR, Detection.CLEAR]):
         if explore:
-            turnRight(90)
+            exploreTurn(sense,direction=Direction.RIGHT)
         else:   
             turnRight(2)  
-    elif (sense == [Detection.CLEAR, Detection.CLEAR, Detection.EDGE] or
-          sense == [Detection.EDGE, Detection.CLEAR, Detection.EDGE]):
+    elif (sense == [Detection.CLEAR, Detection.CLEAR, Detection.EDGE]):
         if explore:
-            turnLeft(90)
+            exploreTurn(sense,direction=Direction.LEFT)
         else:
             turnLeft(3)
+    elif sense == [Detection.EDGE, Detection.CLEAR, Detection.EDGE]:
+        turnLeft(3)
     elif (sense == [Detection.CLEAR, Detection.OBSTACLE, Detection.CLEAR] or
           sense == [Detection.EDGE, Detection.OBSTACLE, Detection.CLEAR]):
         robot.straight(-20)
@@ -89,14 +127,9 @@ def behavior(Detection_vec):
         turnLeft(30)
 
 while(True):
-    LeftDetection = normalizeSides(sensorLeft.reflection())
-    MiddleDetection = normalizeMiddle(sensorMiddle.reflection())
-    RightDetection = normalizeSides(sensorRight.reflection())
-
-
     #wait(1000)
     #printSensors(Detection_vec)
-    Detection_vec = [LeftDetection, MiddleDetection, RightDetection]
+    Detection_vec = getDetectionVec()
     behavior(Detection_vec)
 
 
