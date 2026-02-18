@@ -23,3 +23,6 @@ pip install -r .
 ```bash
 pybricksdev run ble example.py
 ```
+
+### Resources
+[pybricks vscdoe guide](https://pybricks.com/project/pybricks-other-editors/#setting-up-a-virtual-environment)
