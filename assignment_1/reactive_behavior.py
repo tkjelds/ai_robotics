@@ -3,7 +3,7 @@ from pybricks.pupdevices import Motor, ColorSensor
 from pybricks.parameters import Direction, Port
 from pybricks.robotics import DriveBase
 from pybricks.tools import wait
-
+from urandom import randint
 hub = PrimeHub()
 sensorRight = ColorSensor(Port.B)
 sensorLeft = ColorSensor(Port.A)
@@ -35,6 +35,10 @@ def printDetection(detection):
     elif detection == Detection.CLEAR:
         print("Clear")
 
+def epsilonGreedy(chance = 5):
+    print("Epsilon Greedy: ", end="")
+    return randint(1,100) < chance 
+
 def brakeWheels():
     leftWheel.hold()
     rightWheel.hold()
@@ -61,22 +65,28 @@ def normalizeSides(x):
     return Detection.CLEAR if x > 1 else Detection.EDGE
 
 def behavior(Detection_vec):
-    # Vec = [Left, Middle, Right]
     sense = Detection_vec
+    explore = epsilonGreedy()
     if (sense == [Detection.CLEAR, Detection.CLEAR, Detection.CLEAR]):
         robot.straight(20,wait=False)
     elif (sense == [Detection.EDGE, Detection.CLEAR, Detection.CLEAR]):
-        turnRight(2)  
+        if explore:
+            turnRight(90)
+        else:   
+            turnRight(2)  
     elif (sense == [Detection.CLEAR, Detection.CLEAR, Detection.EDGE] or
           sense == [Detection.EDGE, Detection.CLEAR, Detection.EDGE]):
-        turnLeft(3)
+        if explore:
+            turnLeft(90)
+        else:
+            turnLeft(3)
     elif (sense == [Detection.CLEAR, Detection.OBSTACLE, Detection.CLEAR] or
           sense == [Detection.EDGE, Detection.OBSTACLE, Detection.CLEAR]):
         robot.straight(-20)
-        turnRight(15)
+        turnRight(30)
     elif (sense == [Detection.CLEAR, Detection.OBSTACLE, Detection.EDGE]):
         robot.straight(-20)
-        turnLeft(15)
+        turnLeft(30)
 
 while(True):
     LeftDetection = normalizeSides(sensorLeft.reflection())
@@ -85,8 +95,8 @@ while(True):
 
 
     #wait(1000)
+    #printSensors(Detection_vec)
     Detection_vec = [LeftDetection, MiddleDetection, RightDetection]
-    printSensors(Detection_vec)
     behavior(Detection_vec)
 
 
