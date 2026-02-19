@@ -114,9 +114,11 @@ def behavior(sense):
     # if Detection.OBSTACLE in sense:
     #     brakeWheels()
     #     wait(100000)
-    if (sense == [Detection.CLEAR, Detection.CLEAR, Detection.CLEAR]):
-        robot.straight(20,wait=False)
-    elif (sense == [Detection.EDGE, Detection.CLEAR, Detection.CLEAR]):
+
+    # Corner evacuation test
+    # if (sense == [Detection.CLEAR, Detection.CLEAR, Detection.CLEAR]):
+    #     robot.straight(20,wait=False)
+    if (sense == [Detection.EDGE, Detection.CLEAR, Detection.CLEAR]):
         if explore:
             exploreTurn(sense,direction=Direction.RIGHT)
         else:   
