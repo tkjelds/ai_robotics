@@ -8,7 +8,7 @@ ConfigParser==7.2.0
 cryptography==46.0.5
 dbus_fast==4.0.0
 docutils==0.22.4
-filelock==3.24.2
+filelock==3.24.3
 hidapi==0.15.0
 HTMLParser==0.0.2
 importlib_metadata==8.7.1
@@ -23,9 +23,10 @@ pandas==3.0.1
 protobuf==6.33.5
 pyOpenSSL==25.3.0
 redis==7.2.0
+seaborn==0.13.2
 setuptools==82.0.0
 sh==2.2.2
-slack_sdk==3.40.0
+slack_sdk==3.40.1
 Sphinx==9.1.0
 tensorflow==2.20.0
 thread==2.0.6
