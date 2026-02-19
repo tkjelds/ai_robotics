@@ -4,6 +4,8 @@ from pybricks.parameters import Direction, Port
 from pybricks.robotics import DriveBase
 from pybricks.tools import wait
 from urandom import randint
+from pybricks.tools import StopWatch, wait
+
 hub = PrimeHub()
 sensorRight = ColorSensor(Port.B)
 sensorLeft = ColorSensor(Port.A)
@@ -101,9 +103,17 @@ def getDetectionVec():
     RightDetection = normalizeSides(sensorRight.reflection())
     return [LeftDetection, MiddleDetection, RightDetection]
 
-def behavior(Detection_vec):
-    sense = Detection_vec
+def behavior(sense):
     explore = epsilonGreedy()
+    # Detection edge test
+    # if Detection.EDGE in sense:
+    #     brakeWheels()
+    #     wait(100000)
+
+    # Detection obstacle test
+    # if Detection.OBSTACLE in sense:
+    #     brakeWheels()
+    #     wait(100000)
     if (sense == [Detection.CLEAR, Detection.CLEAR, Detection.CLEAR]):
         robot.straight(20,wait=False)
     elif (sense == [Detection.EDGE, Detection.CLEAR, Detection.CLEAR]):
@@ -117,7 +127,8 @@ def behavior(Detection_vec):
         else:
             turnLeft(3)
     elif sense == [Detection.EDGE, Detection.CLEAR, Detection.EDGE]:
-        turnLeft(3)
+        robot.straight(-20)
+        turnLeft(60)
     elif (sense == [Detection.CLEAR, Detection.OBSTACLE, Detection.CLEAR] or
           sense == [Detection.EDGE, Detection.OBSTACLE, Detection.CLEAR]):
         robot.straight(-20)
@@ -126,7 +137,10 @@ def behavior(Detection_vec):
         robot.straight(-20)
         turnLeft(30)
 
-while(True):
+watch = StopWatch()
+
+watch.reset()
+while(watch.time() < 30000):
     #wait(1000)
     #printSensors(Detection_vec)
     Detection_vec = getDetectionVec()
