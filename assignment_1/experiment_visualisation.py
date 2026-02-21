@@ -1,12 +1,16 @@
+from glob import glob
+import os
+
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+
 from pathlib import Path
 import json
 
 BASE_DIR = Path(__file__).resolve().parent
 
-json_path = BASE_DIR / "experiment_data.json"
+json_path = BASE_DIR / "measurements" / "experiment_data.json"
 
 with open(json_path, 'r') as f:
     experiment_data = json.load(f)
@@ -17,6 +21,12 @@ def save_plot(plot,filename):
     plot.savefig(path / filename)
 
 ### DATA FRAME CREATION ###
+df_colours = pd.DataFrame(experiment_data["colour_measurement"])
+df_colours = df_colours.T
+df_colours.index = df_colours.index.str.replace("mm", "").astype(int)
+df_colours = df_colours.sort_index()
+
+
 df_exploration = pd.DataFrame(experiment_data["exploration"])
 
 df_edgeDetection = pd.DataFrame(
@@ -33,6 +43,27 @@ df_cornerEvacuation = pd.DataFrame(experiment_data["cornerEvacuation"], columns=
 
 
 ### PLOTS
+
+palette = {
+    "Black": "black",
+    "White": "gray",   # white not visible on white background
+    "Red": "red",
+    "Yellow": "gold"
+}
+
+plt.figure()
+sns.lineplot(
+    data=df_colours,
+    palette=palette,
+    marker="o"
+)
+
+plt.xlabel("Distance (mm)")
+plt.ylabel("Value")
+plt.title("Reflection Measurements by Distance")
+
+save_plot(plt, "Reflection_Measurements_by_Distance")
+plt.show()
 
 plt.figure(figsize=(8,6))
 
@@ -52,6 +83,7 @@ sns.boxplot(data=df_objectDetection, x="Object", y="Distance (mm)")
 sns.swarmplot(data=df_objectDetection, x="Object", y="Distance (mm)", color="black")
 save_plot(plt, "Object Detection Distances")
 plt.show()
+
 plt.title("Distribution of Corner Evacuation Time")
 
 sns.boxplot(y=df_cornerEvacuation["Corner Evacuation Time (s)"])

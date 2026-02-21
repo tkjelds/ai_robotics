@@ -118,6 +118,7 @@ def behavior(sense):
     # Corner evacuation test
     # if (sense == [Detection.CLEAR, Detection.CLEAR, Detection.CLEAR]):
     #     robot.straight(20,wait=False)
+    
     if (sense == [Detection.EDGE, Detection.CLEAR, Detection.CLEAR]):
         if explore:
             exploreTurn(sense,direction=Direction.RIGHT)
