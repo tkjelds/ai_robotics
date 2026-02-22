@@ -12,6 +12,13 @@ BASE_DIR = Path(__file__).resolve().parent
 
 json_path = BASE_DIR / "measurements" / "experiment_data.json"
 
+palette = {
+    "Black": "black",
+    "White": "gray",   # white not visible on white background
+    "Red": "red",
+    "Yellow": "gold"
+}
+
 with open(json_path, 'r') as f:
     experiment_data = json.load(f)
 
@@ -26,6 +33,10 @@ df_colours = df_colours.T
 df_colours.index = df_colours.index.str.replace("mm", "").astype(int)
 df_colours = df_colours.sort_index()
 
+df_angle_colours = pd.DataFrame(experiment_data["45degree_sensor_test"])
+df_angle_colours = df_angle_colours.T
+df_angle_colours.index = df_angle_colours.index.str.replace("mm", "").astype(int)
+df_angle_colours = df_angle_colours.sort_index()
 
 df_exploration = pd.DataFrame(experiment_data["exploration"])
 
@@ -44,12 +55,23 @@ df_cornerEvacuation = pd.DataFrame(experiment_data["cornerEvacuation"], columns=
 
 ### PLOTS
 
-palette = {
-    "Black": "black",
-    "White": "gray",   # white not visible on white background
-    "Red": "red",
-    "Yellow": "gold"
-}
+
+
+plt.figure()
+sns.lineplot(
+    data=df_angle_colours,
+    palette=palette,
+    marker="o"
+)
+
+plt.xlabel("Distance (mm)")
+plt.ylabel("Value")
+plt.title("Reflection Measurements by Distance (45 Degree sensor angle)")
+
+save_plot(plt, "Reflection_45degree_Measurements_by_Distance")
+plt.show()
+
+
 
 plt.figure()
 sns.lineplot(
