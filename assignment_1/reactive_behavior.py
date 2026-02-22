@@ -59,6 +59,9 @@ def opposite(direction):
 def epsilonGreedy(chance = 1):
     return randint(1,100) <= chance 
 
+def chanceTurn(chance = 50):
+    return randint(1,100) <= chance 
+
 def exploreTurn(sen_vec, degrees = 90, direction = Direction.RIGHT):
     turned = 0
     while (sen_vec[direction] == Detection.CLEAR and turned < degrees):
@@ -109,19 +112,10 @@ def getDetectionVec():
 
 def behavior(sense):
     explore = epsilonGreedy()
-    # Detection edge test
-    # if Detection.EDGE in sense:
-    #     brakeWheels()
-    #     wait(100000)
+    turn = chanceTurn()
 
-    # Detection obstacle test
-    # if Detection.OBSTACLE in sense:
-    #     brakeWheels()
-    #     wait(100000)
-
-    # Corner evacuation test
-    # if (sense == [Detection.CLEAR, Detection.CLEAR, Detection.CLEAR]):
-    #     robot.straight(20,wait=False)
+    if (sense == [Detection.CLEAR, Detection.CLEAR, Detection.CLEAR]):
+        robot.straight(20,wait=False)
     
     if (sense == [Detection.EDGE, Detection.CLEAR, Detection.CLEAR]):
         if explore:
@@ -133,22 +127,37 @@ def behavior(sense):
             exploreTurn(sense,direction=Direction.LEFT)
         else:
             turnLeft(3)
-    elif sense == [Detection.EDGE, Detection.CLEAR, Detection.EDGE]:
+    elif (sense == [Detection.EDGE, Detection.CLEAR, Detection.EDGE] or
+          sense == [Detection.OBSTACLE, Detection.OBSTACLE, Detection.OBSTACLE] or
+          sense == [Detection.OBSTACLE, Detection.CLEAR, Detection.OBSTACLE] or 
+          sense == [Detection.OBSTACLE, Detection.CLEAR, Detection.OBSTACLE]):
         robot.straight(-20)
-        turnLeft(60)
-    elif (sense == [Detection.CLEAR, Detection.OBSTACLE, Detection.CLEAR] or
-          sense == [Detection.EDGE, Detection.OBSTACLE, Detection.CLEAR]):
+        if turn:
+            turnLeft(60)
+        else:
+            turnRight(60)
+    elif sense == [Detection.CLEAR, Detection.OBSTACLE, Detection.CLEAR]: 
+        robot.straight(-20)
+        if chanceTurn():
+            turnRight(30)
+        else:
+            turnLeft(30)
+    elif (sense == [Detection.EDGE, Detection.OBSTACLE, Detection.CLEAR] or 
+          sense == [Detection.OBSTACLE, Detection.CLEAR, Detection.CLEAR] or 
+          sense == [Detection.OBSTACLE, Detection.OBSTACLE, Detection.CLEAR] or
+          sense == [Detection.EDGE, Detection.CLEAR, Detection.OBSTACLE] or 
+          sense == [Detection.EDGE, Detection.OBSTACLE, Detection.OBSTACLE]):
         robot.straight(-20)
         turnRight(30)
-    elif (sense == [Detection.CLEAR, Detection.OBSTACLE, Detection.EDGE]):
+    elif (sense == [Detection.CLEAR, Detection.OBSTACLE, Detection.EDGE] or 
+          sense == [Detection.CLEAR, Detection.CLEAR, Detection.OBSTACLE] or 
+          sense == [Detection.CLEAR, Detection.OBSTACLE, Detection.OBSTACLE] or
+          sense == [Detection.OBSTACLE, Detection.CLEAR, Detection.EDGE] or
+          sense == [Detection.OBSTACLE, Detection.OBSTACLE, Detection.EDGE]
+          ):
         robot.straight(-20)
-        turnLeft(30)
-    elif sense == [Detection.OBSTACLE, Detection.CLEAR, Detection.CLEAR]:
-    elif sense == [Detection.OBSTACLE, Detection.OBSTACLE, Detection.CLEAR]:
-    elif sense == [Detection.CLEAR, Detection.CLEAR, Detection.OBSTACLE] or 
-    sense == [Detection.CLEAR, Detection.OBSTACLE, Detection.OBSTACLE]:
-    elif sense == [Detection.CLEAR, Detection.CLEAR, Detection.CLEAR]:
-    
+        turnLeft(30) 
+        
 watch = StopWatch()
 
 watch.reset()
