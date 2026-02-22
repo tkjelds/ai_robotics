@@ -15,6 +15,8 @@ rightWheel = Motor(Port.F)
 leftWheel = Motor(Port.E, Direction.COUNTERCLOCKWISE)
 
 robot = DriveBase(leftWheel, rightWheel, wheel_diameter=55, axle_track=115)
+ 
+baseline_reflection = sensorRight.reflection()
 
 def printSensors(Detection_vec):
     print("Left: ", end="")
@@ -95,7 +97,9 @@ def normalizeMiddle(value):
     return Detection.OBSTACLE if value > 0 else Detection.CLEAR
 
 def normalizeSides(value):
-    return Detection.CLEAR if value > 1 else Detection.EDGE
+    if value == baseline_reflection:
+        return Detection.CLEAR
+    return Detection.EDGE if value < baseline_reflection else Detection.OBSTACLE
 
 def getDetectionVec():
     LeftDetection = normalizeSides(sensorLeft.reflection())
@@ -139,7 +143,12 @@ def behavior(sense):
     elif (sense == [Detection.CLEAR, Detection.OBSTACLE, Detection.EDGE]):
         robot.straight(-20)
         turnLeft(30)
-
+    elif sense == [Detection.OBSTACLE, Detection.CLEAR, Detection.CLEAR]:
+    elif sense == [Detection.OBSTACLE, Detection.OBSTACLE, Detection.CLEAR]:
+    elif sense == [Detection.CLEAR, Detection.CLEAR, Detection.OBSTACLE] or 
+    sense == [Detection.CLEAR, Detection.OBSTACLE, Detection.OBSTACLE]:
+    elif sense == [Detection.CLEAR, Detection.CLEAR, Detection.CLEAR]:
+    
 watch = StopWatch()
 
 watch.reset()

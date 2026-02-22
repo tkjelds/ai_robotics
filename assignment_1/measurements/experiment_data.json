@@ -41,6 +41,26 @@
                 "Red" : 0,
                 "Yellow" : 2    
             }
+    },
+    "45degree_sensor_test": {
+        "15mm":
+            {
+                "Black" : 1,
+                "white" : 17,
+                "Yellow" : 6
+            },
+        "25mm":
+            {
+                "Black" : 2,
+                "white" : 7,
+                "Yellow" : 4
+            },
+        "50mm":
+            {
+                "Black" : 3,
+                "white" : 4,
+                "Yellow" : 5
+            }
     }
 
 }
