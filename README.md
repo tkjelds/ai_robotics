@@ -1,6 +1,4 @@
 # ai_robotics
-
-
 ## Commands
 ### Create virutal environment
 ``` bash
