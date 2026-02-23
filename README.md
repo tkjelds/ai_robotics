@@ -2,10 +2,11 @@
 
 
 ## Commands
-### Environment
+### Create virutal environment
 ``` bash
 python 3 -m venv .venv
 ```
+### Activate virtual environement
 #### unix
 ``` bash
 source .venv/bin/activate
@@ -16,10 +17,10 @@ venv\Scripts\activate
 ```
 #### Install reqpackages
 ``` bash
-pip install -r .
+pip install -r requirements.txt
 ```
 
-### Commands
+### Run pybricks from terminal
 ```bash
 pybricksdev run ble example.py
 ```
