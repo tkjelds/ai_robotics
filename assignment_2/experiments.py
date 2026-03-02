@@ -105,7 +105,6 @@ def explore(detection_vec):
 
 
 def straight():
-    # print("Straight")
     robot.straight(10,wait=False)
 
 # print("Reflection Test")
