@@ -1,80 +1,182 @@
+from collections import deque
+q = deque()
+
 bounds_y = 4
 bounds_x = 4
-goalStates = [[0,1],[1,0]]
+goalStates = [[1,1],[3,1]]
 exploredStates = []
 
-class state:
+
+def printState(state):
+    worldMap = [[" ", " ", " ", " "], [" ", " ", " ", " "], [" ", " ", " ", " "], [" ", " ", " ", " "]]
+    for can in state.cans:
+        worldMap[can[0]][can[1]] = "C"
+    for goal in goalStates:
+        worldMap[goal[0]][goal[1]] = "G"
+    worldMap[state.position[0]][state.position[1]] = printDirection(state.direction)
+    for row in worldMap:
+        print(row)
+    print("\n")
+
+class State:
     def __init__(self, position, direction, cans):
         self.position = position
         self.direction = direction
         self.cans = cans
         
-
 class Directions:
-    NORTH = [1,0]
-    SOUTH = [0,-1]
+    NORTH = [-1,0]
+    SOUTH = [1,0]
     EAST = [0,1]
-    WEST = [-1,0]
+    WEST = [0,-1]
+    
+def printDirection(direction):
+    if direction == Directions.NORTH:
+        return "^"
+    elif direction == Directions.SOUTH:
+        return "v"
+    elif direction == Directions.EAST:
+        return ">"
+    elif direction == Directions.WEST:
+        return "<"
+    
+
+def turnLeft(direction):
+    if direction == Directions.NORTH:
+        return Directions.WEST
+    elif direction == Directions.WEST:
+        return Directions.SOUTH
+    elif direction == Directions.SOUTH:
+        return Directions.EAST
+    elif direction == Directions.EAST:
+        return Directions.NORTH
+        
+def turnRight(direction):
+    if direction == Directions.NORTH:
+        return Directions.EAST
+    elif direction == Directions.EAST:
+        return Directions.SOUTH
+    elif direction    == Directions.SOUTH:
+        return Directions.WEST
+    elif direction == Directions.WEST:
+        return Directions.NORTH
     
 class Actions:
     FORWARD = 0
     LEFT = 1
     RIGHT = 2
     
+def actionPrint(action):
+    if action == Actions.FORWARD:
+        return "FORWARD"
+    elif action == Actions.LEFT:
+        return "LEFT"
+    elif action == Actions.RIGHT:
+        return "RIGHT"
     
 class Node: 
-    def __init__(self, state, parent, action):
+    def __init__(self, state, parent, action, children = []):
         self.state = state
         self.parent = parent
         self.action = action
-
-
+        self.children = children
+        
 def isGoalState(state):
     return state.cans == goalStates
 
 def returnPath(node):
     path = []
     while node.parent != None:
-        path.append(node.action)
+        path.append(actionPrint(node.action))
         node = node.parent
     return path[::-1]
 
 def isOutOfBounds(position):
-    return position[0] < 0 or position[0] >= bounds_x-1 or position[1] < 0 or position[1] >= bounds_y-1
-
-def isInfront(position_1, position_2, direction):
-    return position_1[0] + direction[0] == position_2[0] and position_1[1] + direction[1] == position_2[1]
+    return position[0] < 0 or position[0] >= bounds_x or position[1] < 0 or position[1] >= bounds_y
 
 def expand(node):
     newNodes = []
     for action in [Actions.FORWARD, Actions.LEFT, Actions.RIGHT]:
         newState = apply(node.state, action)
         if newState != None:
-            newNodes.append(Node(newState, node, action))
+            newNode = Node(newState, node, action)
+            newNodes.append(newNode)
+            q.append(newNode)
+        node.children = newNodes
     return newNodes
 
+def explored(state):
+    for exploredState in exploredStates:
+        if state.position == exploredState.position and state.direction == exploredState.direction and state.cans == exploredState.cans:
+            return True
+    return False
+
+def printSolution(node):
+    currentNode = node
+    while currentNode.parent != None:
+        printState(currentNode.state)
+        currentNode = currentNode.parent
+
+def getSolution(node):
+    solution = []
+    currentNode = node
+    while currentNode.parent != None:
+        solution.append(currentNode.action)
+        currentNode = currentNode.parent
+    return solution[::-1]
+        
+# Takes a state and an action, returns the new state if the action is valid, else returns None
 def apply(state, action):
     newPosition = [state.position[0] + state.direction[0], state.position[1] + state.direction[1]]
     if action == Actions.FORWARD:
         for can in state.cans:
-            if isInfront(state.position, can, state.direction):
+            if can == newPosition: # If there is a can in front of the robot, try to push it
                 newCans = state.cans.copy()
                 newCans.remove(can)
-                newCan = [can[0] + state.direction[0], can[1] + state.direction[1]]
-                if not isOutOfBounds(newCan):
+                newCan = [can[0] + state.direction[0], can[1] + state.direction[1]] # Update can position 
+                if not isOutOfBounds(newCan) and newCan not in state.cans: # Don't push can out of bounds or into another can
                     newCans.append(newCan)
-                    return state(newPosition, state.direction, newCans)
+                    newState = State(newPosition, state.direction, newCans)
+                    if explored(newState):
+                        return None
+                    else:
+                        exploredStates.append(newState)
+                        return newState
                 else: 
                     return None
 
-        if isOutOfBounds(newPosition):
+        if isOutOfBounds(newPosition): # Don't return state to move out of bounds
             return None
-        else:
-            return state(newPosition, state.direction, state.cans)
+        else: # Move forward without pushing a can
+            newState = State(newPosition, state.direction, state.cans)
+            if explored(newState):
+                return None
+            else:            
+                exploredStates.append(newState)
+                return newState
     elif action == Actions.LEFT:
-        # TODO
+        newState = State(state.position, turnLeft(state.direction), state.cans)
+        if explored(newState):
+            return None
+        else:            
+            exploredStates.append(newState)
+            return newState
     elif action == Actions.RIGHT:
-        # TODO
+        newState = State(state.position, turnRight(state.direction), state.cans)
+        if explored(newState):
+            return None
+        else:            
+            exploredStates.append(newState)
+            return newState
         
-InitialNode = Node(state([0,0], Directions.NORTH, [[0,1],[1,0]]), None, None)
-while True:
+InitialNode = Node(State([0,0], Directions.NORTH, [[2,1],[3,2]]), None, None)
+q.append(InitialNode)
+
+while q:
+    node = q.popleft()
+    if isGoalState(node.state):
+        printSolution(node)
+        print("Goal state found!")
+        print("Path to goal: ", returnPath(node))
+        break
+    expand(node)
