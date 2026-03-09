@@ -179,12 +179,12 @@ def apply(state, action):
 
 finish = []
 
-def getActions(state):
-    initialNode = Node(state, None,None)
-    q.append(initialNode)
+def getActions(Node):
+    #initialNode = Node(state, None,None)
+    q.append(Node)
     while q:
         currentNode = q.pop(0)
-        if isGoalState(currentNode):
+        if isGoalState(currentNode.state):
             return returnPath(currentNode)
         expand(currentNode)
     return []
