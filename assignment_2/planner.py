@@ -174,17 +174,33 @@ def apply(state, action):
             exploredStates.append(newState)
             return newState
         
-InitialNode = Node(State([0,0], Directions.NORTH, [[3,1],[0,1]]), None, None)
-q.append(InitialNode)
+#InitialNode = Node(State([0,0], Directions.NORTH, [[3,1],[0,1]]), None, None)
+#q.append(InitialNode)
+
+finish = []
+
+def getActions(state):
+    initialNode = Node(state, None,None)
+    q.append(initialNode)
+    while q:
+        currentNode = q.pop(0)
+        if isGoalState(currentNode):
+            return returnPath(currentNode)
+        expand(currentNode)
+    return []
+
 
 while q:
     node = q.pop(0)
     if isGoalState(node.state):
         printSolution(node)
-        print("Goal state found!")
-        print("Path to goal: ", returnPath(node))
-        print("Explored states: ", len(exploredStates))
+        finish = returnPath(node)
+        # print("Goal state found!")
+        # print("Path to goal: ", returnPath(node))
+        # print("Explored states: ", len(exploredStates))
         break
     expand(node)
     
-print("No solution found. Explored states: ", len(exploredStates))
+# Execute finish
+
+# print("No solution found. Explored states: ", len(exploredStates))
