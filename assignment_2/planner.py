@@ -1,5 +1,5 @@
-from collections import deque
-q = deque()
+#from collections import deque
+q = []
 
 bounds_x = 4
 bounds_y = 4
@@ -178,7 +178,7 @@ InitialNode = Node(State([0,0], Directions.NORTH, [[3,1],[0,1]]), None, None)
 q.append(InitialNode)
 
 while q:
-    node = q.popleft()
+    node = q.pop(0)
     if isGoalState(node.state):
         printSolution(node)
         print("Goal state found!")
