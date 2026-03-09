@@ -82,17 +82,17 @@
 [' ', 'G', 'C', ' ']
 
 
-['v', ' ', ' ', ' ']
-[' ', 'G', ' ', ' ']
+[' ', ' ', ' ', ' ']
+['<', 'G', ' ', ' ']
 [' ', 'C', ' ', ' ']
 [' ', 'G', 'C', ' ']
 
 
-['<', ' ', ' ', ' ']
-[' ', 'G', ' ', ' ']
+[' ', ' ', ' ', ' ']
+[' ', '<', ' ', ' ']
 [' ', 'C', ' ', ' ']
 [' ', 'G', 'C', ' ']
 
 
 Goal state found!
-Path to goal:  ['LEFT', 'LEFT', 'FORWARD', 'FORWARD', 'FORWARD', 'LEFT', 'FORWARD', 'LEFT', 'FORWARD', 'RIGHT', 'FORWARD', 'FORWARD', 'RIGHT', 'FORWARD', 'RIGHT', 'FORWARD']
+Path to goal:  ['LEFT', 'FORWARD', 'LEFT', 'FORWARD', 'FORWARD', 'LEFT', 'FORWARD', 'LEFT', 'FORWARD', 'RIGHT', 'FORWARD', 'FORWARD', 'RIGHT', 'FORWARD', 'RIGHT', 'FORWARD']

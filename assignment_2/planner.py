@@ -1,9 +1,9 @@
 from collections import deque
 q = deque()
 
-bounds_y = 4
 bounds_x = 4
-goalStates = [[1,1],[3,1]]
+bounds_y = 4
+goalStates = [[0,3],[3,0]]
 exploredStates = []
 
 
@@ -65,14 +65,7 @@ class Actions:
     FORWARD = 0
     LEFT = 1
     RIGHT = 2
-    
-def actionPrint(action):
-    if action == Actions.FORWARD:
-        return "FORWARD"
-    elif action == Actions.LEFT:
-        return "LEFT"
-    elif action == Actions.RIGHT:
-        return "RIGHT"
+    PUSH = 3
     
 class Node: 
     def __init__(self, state, parent, action, children = []):
@@ -80,6 +73,16 @@ class Node:
         self.parent = parent
         self.action = action
         self.children = children
+        
+def actionPrint(action):
+    if action == Actions.FORWARD:
+        return "FORWARD"
+    elif action == Actions.LEFT:
+        return "LEFT"
+    elif action == Actions.RIGHT:
+        return "RIGHT"
+    elif action == Actions.PUSH:
+        return "PUSH"
         
 def isGoalState(state):
     return state.cans == goalStates
@@ -99,6 +102,8 @@ def expand(node):
     for action in [Actions.FORWARD, Actions.LEFT, Actions.RIGHT]:
         newState = apply(node.state, action)
         if newState != None:
+            if node.state.cans != newState.cans: # If the can position has changed, the robot has pushed a can
+                action = Actions.PUSH
             newNode = Node(newState, node, action)
             newNodes.append(newNode)
             q.append(newNode)
@@ -169,7 +174,7 @@ def apply(state, action):
             exploredStates.append(newState)
             return newState
         
-InitialNode = Node(State([0,0], Directions.NORTH, [[2,1],[3,2]]), None, None)
+InitialNode = Node(State([0,0], Directions.NORTH, [[3,1],[0,1]]), None, None)
 q.append(InitialNode)
 
 while q:
@@ -178,5 +183,8 @@ while q:
         printSolution(node)
         print("Goal state found!")
         print("Path to goal: ", returnPath(node))
+        print("Explored states: ", len(exploredStates))
         break
     expand(node)
+    
+print("No solution found. Explored states: ", len(exploredStates))
