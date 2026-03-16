@@ -3,7 +3,7 @@ q = []
 
 bounds_x = 4
 bounds_y = 4
-goalStates = [[0,3],[3,0]]
+goalStates = [[3,2],[0,0]]
 exploredStates = []
 
 
@@ -65,7 +65,8 @@ class Actions:
     FORWARD = 0
     LEFT = 1
     RIGHT = 2
-    PUSH = 3
+    PUSH_HORIZONTAL = 3
+    PUSH_VERTICAL = 4
     
 class Node: 
     def __init__(self, state, parent, action, children = []):
@@ -81,8 +82,10 @@ def actionPrint(action):
         return "LEFT"
     elif action == Actions.RIGHT:
         return "RIGHT"
-    elif action == Actions.PUSH:
-        return "PUSH"
+    elif action == Actions.PUSH_HORIZONTAL:
+        return "PUSH_HORIZONTAL"
+    elif action == Actions.PUSH_VERTICAL:
+        return "PUSH_VERTICAL"
         
 def isGoalState(state):
     return state.cans == goalStates
@@ -103,7 +106,10 @@ def expand(node):
         newState = apply(node.state, action)
         if newState != None:
             if node.state.cans != newState.cans: # If the can position has changed, the robot has pushed a can
-                action = Actions.PUSH
+                if node.state.direction == Directions.NORTH or node.state.direction == Directions.SOUTH:
+                    action = Actions.PUSH_VERTICAL
+                else:
+                    action = Actions.PUSH_HORIZONTAL
             newNode = Node(newState, node, action)
             newNodes.append(newNode)
             q.append(newNode)
@@ -177,8 +183,6 @@ def apply(state, action):
 #InitialNode = Node(State([0,0], Directions.NORTH, [[3,1],[0,1]]), None, None)
 #q.append(InitialNode)
 
-finish = []
-
 def getActions(Node):
     #initialNode = Node(state, None,None)
     q.append(Node)
@@ -189,15 +193,19 @@ def getActions(Node):
         expand(currentNode)
     return []
 
+node = Node(State([0,0], Directions.NORTH, [[1,2],[2,2]]), None, None)
+q.append(node)
+# route = getActions (initialNode)
+# print(route)
 
 while q:
     node = q.pop(0)
     if isGoalState(node.state):
         printSolution(node)
         finish = returnPath(node)
-        # print("Goal state found!")
-        # print("Path to goal: ", returnPath(node))
-        # print("Explored states: ", len(exploredStates))
+        print("Goal state found!")
+        print("Path to goal: ", returnPath(node))
+        print("Explored states: ", len(exploredStates))
         break
     expand(node)
     
