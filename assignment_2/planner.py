@@ -1,9 +1,9 @@
-#from collections import deque
+import time
 q = []
 
 bounds_x = 4
 bounds_y = 4
-goalStates = [[3,2],[0,0]]
+goalStates = [[0,0],[0,3],[3,2]]
 exploredStates = []
 
 
@@ -193,22 +193,27 @@ def getActions(Node):
         expand(currentNode)
     return []
 
-node = Node(State([0,0], Directions.NORTH, [[1,2],[2,2]]), None, None)
-q.append(node)
-# route = getActions (initialNode)
-# print(route)
 
-while q:
-    node = q.pop(0)
-    if isGoalState(node.state):
-        printSolution(node)
-        finish = returnPath(node)
-        print("Goal state found!")
-        print("Path to goal: ", returnPath(node))
-        print("Explored states: ", len(exploredStates))
-        break
-    expand(node)
-    
+for x in range(5): 
+    exploredStates = []
+    q = []
+    node = Node(State([3,0], Directions.NORTH, [[2,1],[2,2],[2,3]]), None, None)
+    q.append(node)
+    # route = getActions (initialNode)
+    # print(route)
+    start = time.time()
+    while q:
+        node = q.pop(0)
+        if isGoalState(node.state):
+            #printSolution(node)
+            #finish = returnPath(node)
+            #print("Goal state found!")
+            #print("Path to goal: ", returnPath(node))
+            #print("Explored states: ", len(exploredStates))
+            break
+        expand(node)
+    end = time.time()
+    print("Execution time: ", end - start, " seconds")
 # Execute finish
 
 # print("No solution found. Explored states: ", len(exploredStates))

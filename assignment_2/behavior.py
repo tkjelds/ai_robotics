@@ -11,7 +11,8 @@ from pybricks.tools import StopWatch, wait
 #initialNode = pl.Node(pl.State([0,0], pl.Directions.NORTH, [[1,2],[2,2]]), None, None)
 # route = pl.getActions (initialNode)
 # route = ['RIGHT', 'FORWARD', 'FORWARD', 'FORWARD', 'RIGHT', 'FORWARD', 'RIGHT', 'PUSH', 'PUSH', 'LEFT', 'LEFT', 'FORWARD', 'RIGHT', 'PUSH', 'RIGHT', 'FORWARD', 'FORWARD', 'RIGHT', 'PUSH']
-route = ['RIGHT', 'FORWARD', 'FORWARD', 'FORWARD', 'RIGHT', 'FORWARD', 'RIGHT', 'PUSH_HORIZONTAL', 'PUSH_HORIZONTAL', 'LEFT', 'LEFT', 'FORWARD', 'RIGHT', 'PUSH_VERTICAL', 'RIGHT', 'FORWARD', 'FORWARD', 'RIGHT', 'PUSH_VERTICAL']
+#route = ['RIGHT', 'FORWARD', 'LEFT', 'PUSH_VERTICAL', 'PUSH_VERTICAL', 'RIGHT', 'FORWARD', 'LEFT', 'FORWARD', 'LEFT', 'PUSH_HORIZONTAL', 'LEFT', 'FORWARD', 'FORWARD', 'FORWARD', 'LEFT', 'FORWARD', 'FORWARD', 'LEFT', 'PUSH_VERTICAL', 'PUSH_VERTICAL', 'LEFT', 'FORWARD', 'LEFT', 'PUSH_VERTICAL']
+route = ['RIGHT', 'FORWARD', 'LEFT', 'PUSH_VERTICAL', 'PUSH_VERTICAL', 'RIGHT', 'FORWARD', 'LEFT', 'FORWARD', 'LEFT', 'PUSH_HORIZONTAL', 'LEFT', 'FORWARD', 'FORWARD', 'FORWARD', 'LEFT', 'FORWARD', 'FORWARD', 'LEFT', 'PUSH_VERTICAL', 'PUSH_VERTICAL', 'LEFT', 'FORWARD', 'LEFT', 'PUSH_VERTICAL']
 hub = PrimeHub()
 left_sensor = ColorSensor(Port.A)
 right_sensor = ColorSensor(Port.B)
@@ -71,13 +72,13 @@ def forward(offset = 0, backwards = False):
         elif detection_vec == [Detection.NO_LINE, Detection.NO_LINE,Detection.LINE]:
             print("Turning left")
             robot.brake()
-            robot.turn(-30 * direction)
-            robot.straight(10)
+            robot.turn(-15 * direction)
+            robot.straight(10,wait=False),
         elif detection_vec == [Detection.LINE, Detection.NO_LINE,Detection.NO_LINE]:
             print("Turning right")
             robot.brake()
-            robot.turn(30)
-            robot.straight(10)
+            robot.turn(15)
+            robot.straight(10, wait=False)
         elif detection_vec == [Detection.NO_LINE, Detection.NO_LINE,Detection.NO_LINE]:
             print("Lost line", end="")
             robot.brake()
@@ -125,10 +126,10 @@ if reflectionCalibation:
     while(True):
         print("right: ", end="")
         print(right_sensor.reflection())
-        print("left: ", end="")
-        print(left_sensor.reflection())
-        print("middle: ", end="")
-        print(middle_sensor.reflection())
+        # print("left: ", end="")
+        # print(left_sensor.reflection())
+        # print("middle: ", end="")
+        # print(middle_sensor.reflection())
         wait(1000)
 else: 
     for action in route:
