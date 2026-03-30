@@ -10,9 +10,10 @@ from pybricks.tools import StopWatch, wait
 #state = pl.State([0,0], pl.Directions.NORTH, [[3,1],[0,1]])
 #initialNode = pl.Node(pl.State([0,0], pl.Directions.NORTH, [[1,2],[2,2]]), None, None)
 # route = pl.getActions (initialNode)
-# route = ['RIGHT', 'FORWARD', 'FORWARD', 'FORWARD', 'RIGHT', 'FORWARD', 'RIGHT', 'PUSH', 'PUSH', 'LEFT', 'LEFT', 'FORWARD', 'RIGHT', 'PUSH', 'RIGHT', 'FORWARD', 'FORWARD', 'RIGHT', 'PUSH']
 #route = ['RIGHT', 'FORWARD', 'LEFT', 'PUSH_VERTICAL', 'PUSH_VERTICAL', 'RIGHT', 'FORWARD', 'LEFT', 'FORWARD', 'LEFT', 'PUSH_HORIZONTAL', 'LEFT', 'FORWARD', 'FORWARD', 'FORWARD', 'LEFT', 'FORWARD', 'FORWARD', 'LEFT', 'PUSH_VERTICAL', 'PUSH_VERTICAL', 'LEFT', 'FORWARD', 'LEFT', 'PUSH_VERTICAL']
-route = ['RIGHT', 'FORWARD', 'LEFT', 'PUSH_VERTICAL', 'PUSH_VERTICAL', 'RIGHT', 'FORWARD', 'LEFT', 'FORWARD', 'LEFT', 'PUSH_HORIZONTAL', 'LEFT', 'FORWARD', 'FORWARD', 'FORWARD', 'LEFT', 'FORWARD', 'FORWARD', 'LEFT', 'PUSH_VERTICAL', 'PUSH_VERTICAL', 'LEFT', 'FORWARD', 'LEFT', 'PUSH_VERTICAL']
+
+route = ["RIGHT","RIGHT","RIGHT"]
+# route = ["RIGHT","RIGHT","RIGHT","RIGHT"]
 hub = PrimeHub()
 left_sensor = ColorSensor(Port.A)
 right_sensor = ColorSensor(Port.B)

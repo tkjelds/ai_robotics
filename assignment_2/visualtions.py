@@ -36,16 +36,16 @@ df_sensor_overlap = pd.DataFrame.from_dict(
 
 df_overshoot = pd.DataFrame(
     [(forwards, value) for forwards, values in experiment_data["overshoot"].items() for value in values],
-    columns=["Amount_of_forwards", "Distance (mm)"]
+    columns=["Amount of forwards", "Distance (mm)"]
 )
 
 df_turn_overshoot_left = pd.DataFrame(
     [(turns,value) for turns, values in experiment_data["Degrees_turned_after_amount_of_left_turns"].items() for value in values],
-    columns=["Amount_of_turns", "Distance (mm)"]
+    columns=["Amount of turns", "Distance (mm)"]
 )
 df_turn_overshoot_right = pd.DataFrame(
     [(turns,value) for turns, values in experiment_data["Degrees_turned_after_amount_of_right_turns"].items() for value in values],
-    columns=["Amount_of_turns", "Distance (mm)"]
+    columns=["Amount of turns", "Distance (mm)"]
 )
 
 df_planner_runtime = pd.DataFrame(experiment_data["Time_to_run_planner_given_class_competion_map"], columns=["Time to run planner (s)"])
@@ -66,8 +66,8 @@ plt.show()
 ## Robot overshoot plot
 plt.figure()
 plt.title("Overshoot given Amount of Forwards")
-sns.boxplot(data=df_overshoot, x="Amount_of_forwards", y="Distance (mm)")
-sns.swarmplot(data=df_overshoot, x="Amount_of_forwards", y="Distance (mm)", color="black")
+sns.boxplot(data=df_overshoot, x="Amount of forwards", y="Distance (mm)")
+sns.swarmplot(data=df_overshoot, x="Amount of forwards", y="Distance (mm)", color="black")
 
 save_plot(plt, "forward_overshoot")
 plt.show()
@@ -75,8 +75,8 @@ plt.show()
 ## Turn overshoot left plot
 plt.figure()
 plt.title("Overshoot given Amount of Left Turns")
-sns.boxplot(data=df_turn_overshoot_left, x="Amount_of_turns", y="Distance (mm)")
-sns.swarmplot(data=df_turn_overshoot_left, x="Amount_of_turns", y="Distance (mm)", color="black")
+sns.boxplot(data=df_turn_overshoot_left, x="Amount of turns", y="Distance (mm)")
+sns.swarmplot(data=df_turn_overshoot_left, x="Amount of turns", y="Distance (mm)", color="black")
 
 save_plot(plt, "left_turn_overshoot")
 plt.show()
@@ -84,8 +84,8 @@ plt.show()
 ## Turn overshoot right plot
 plt.figure()
 plt.title("Overshoot given Amount of Right Turns")
-sns.boxplot(data=df_turn_overshoot_right, x="Amount_of_turns", y="Distance (mm)")
-sns.swarmplot(data=df_turn_overshoot_right, x="Amount_of_turns", y="Distance (mm)", color="black")
+sns.boxplot(data=df_turn_overshoot_right, x="Amount of turns", y="Distance (mm)")
+sns.swarmplot(data=df_turn_overshoot_right, x="Amount of turns", y="Distance (mm)", color="black")
 
 save_plot(plt, "right_turn_overshoot")
 plt.show()
