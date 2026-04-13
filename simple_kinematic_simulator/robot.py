@@ -46,14 +46,35 @@ class DifferentialDriveRobot:
         right_distance, right_color, _ = self.sensors["right"].latest_reading
         
         
-        boundary_threshold = 80
-        if left_distance < boundary_threshold or right_distance < boundary_threshold or front_distance < boundary_threshold:
+        side_threshold = 50
+        front_threshold = 40
+        
+        if front_distance < front_threshold and left_distance > side_threshold and right_distance > side_threshold:
+
+            if random.random() < 0.5:
+                self.left_motor_speed = -0.8
+                self.right_motor_speed = 0.8
+            else:
+                self.left_motor_speed = 0.8
+                self.right_motor_speed = -0.8
+        
+        elif left_distance < side_threshold or right_distance < side_threshold or front_distance < side_threshold:  
             if left_distance > right_distance:
                 self.left_motor_speed = -0.8
                 self.right_motor_speed = 0.8
             else:
                 self.left_motor_speed = 0.8
                 self.right_motor_speed = -0.8
+                
+        else:
+            random_turn_chance = 0.01
+            if random.random() < random_turn_chance:
+                if random.random() < 0.5:
+                    self.left_motor_speed = -1.8
+                    self.right_motor_speed = 1.8
+                else:
+                    self.left_motor_speed = 1.8
+                    self.right_motor_speed = -1.8
 
 
 

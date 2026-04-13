@@ -19,7 +19,7 @@ env = Environment(width, height)
 # (simulated) time taken for one cycle of the robot executing its algorithm
 robot_timestep = 0.1 # in seconds (simulated time)
 
-robot = DifferentialDriveRobot(env,width/2-100,height/2-100,0)
+robot = DifferentialDriveRobot(env,35, 468,-1)
 
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Robot Kinematic Simulator")
@@ -30,6 +30,7 @@ def main():
     # Game loop
     running = True
     while running:
+        #print(pygame.mouse.get_pos())
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
