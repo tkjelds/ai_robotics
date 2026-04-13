@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from numpy import cos, sin, pi
 
@@ -20,20 +22,39 @@ class DifferentialDriveRobot:
         self.right_motor_speed = 0 #rad/s
         #self.theta_noise_level = 0.01
 
-        self.sensor = SingleRayDistanceAndColorSensor(100, 0)
+        self.sensors = {
+            "front": SingleRayDistanceAndColorSensor(200, 0),
+            "left": SingleRayDistanceAndColorSensor(200, -0.80),
+            "right": SingleRayDistanceAndColorSensor(200, 0.80)
+        }
 
     def move(self, robot_timestep): # run the control algorithm here
         # simulate kinematics during one execution cycle of the robot
         self._step_kinematics(robot_timestep)
-
+        
         # check for collision
         self.collided = self.env.check_collision(self.get_robot_pose(), self.get_robot_radius())
 
         # update sensors
         self.sense()
-
+        self.left_motor_speed = 0.4
+        self.right_motor_speed = 0.4
         # run the control algorithm and update motor speeds
-        # ...
+        # Random turn
+        front_distance, front_color, _ = self.sensors["front"].latest_reading
+        left_distance, left_color, _ = self.sensors["left"].latest_reading
+        right_distance, right_color, _ = self.sensors["right"].latest_reading
+        
+        
+        boundary_threshold = 80
+        if left_distance < boundary_threshold or right_distance < boundary_threshold or front_distance < boundary_threshold:
+            if left_distance > right_distance:
+                self.left_motor_speed = -0.8
+                self.right_motor_speed = 0.8
+            else:
+                self.left_motor_speed = 0.8
+                self.right_motor_speed = -0.8
+
 
 
 
@@ -51,7 +72,9 @@ class DifferentialDriveRobot:
     def sense(self):
         obstacles = self.env.get_obstacles()
         robot_pose = self.get_robot_pose()
-        self.sensor.generate_beam_and_measure(robot_pose, obstacles)
+        for sensor in self.sensors.values():
+            if isinstance(sensor, SingleRayDistanceAndColorSensor):
+                sensor.generate_beam_and_measure(robot_pose, obstacles)
 
     # this is in fact what a robot can predict about its own future position
     def _odometer(self, delta_time):
@@ -100,7 +123,8 @@ class DifferentialDriveRobot:
         pygame.draw.line(surface, (255, 0, 0), (self.x, self.y), (heading_x, heading_y), 5)
 
         # Draw sensor beams
-        self.sensor.draw(self.get_robot_pose(),surface)
+        for sensor in self.sensors.values():
+            sensor.draw(self.get_robot_pose(), surface)
 
 
 class RobotPose:
