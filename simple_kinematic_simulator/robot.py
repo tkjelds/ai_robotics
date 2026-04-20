@@ -6,6 +6,7 @@ from numpy import cos, sin, pi
 from sensor import SingleRayDistanceAndColorSensor
 
 class DifferentialDriveRobot:
+    sensorValues = []
     def __init__(self, env, x, y, theta, axel_length=40, wheel_radius=10, max_motor_speed=2*pi, kinematic_timestep=0.01):
         self.env = env
         self.x = x
@@ -28,9 +29,39 @@ class DifferentialDriveRobot:
             "right": SingleRayDistanceAndColorSensor(200, 0.80)
         }
 
+    def leftSpeed(self,w1, w2, w3, w4, sensorVals, rightSpeed):
+        return w1 * sensorVals[0] + w2 * sensorVals[1] + w3 * sensorVals[2] + w4 * rightSpeed
+    def rightSpeed(self,w1, w2, w3, w4, sensorVals, leftSpeed):
+        return w1 * sensorVals[0] + w2 * sensorVals[1] + w3 * sensorVals[2] + w4 * leftSpeed
+
+    def generateIndividuals(N):
+        #Generate a matrix of integer arrays between 1 and 5
+        individuals = [N][N]
+        for j in range(5):
+            for i in range(N):
+                random_int = random.random(0, 0.1)
+                individuals[i][j] = random_int
+
+        return individuals
+    def evolve():
+        chromosome = [5,5,5,5]
+        return chromosome
+    def fitness(self, sensorVals):
+        fitness = 0
+        for i in self.sensorValues:
+            fitness = fitness + 1-min(i)
+        return fitness
+    
+    def normalizeSensors(self,sensorVals):
+        maxValue = 200
+        return [sensorVals[0]/maxValue, sensorVals[1]/maxValue, sensorVals[2]/maxValue]
+
+
+
     def move(self, robot_timestep): # run the control algorithm here
         # simulate kinematics during one execution cycle of the robot
         self._step_kinematics(robot_timestep)
+        
         
         # check for collision
         self.collided = self.env.check_collision(self.get_robot_pose(), self.get_robot_radius())
@@ -44,37 +75,21 @@ class DifferentialDriveRobot:
         front_distance, front_color, _ = self.sensors["front"].latest_reading
         left_distance, left_color, _ = self.sensors["left"].latest_reading
         right_distance, right_color, _ = self.sensors["right"].latest_reading
+        sensorVals = self.normalizeSensors([left_distance, front_distance, right_distance])
         
-        
-        side_threshold = 50
-        front_threshold = 40
-        
-        if front_distance < front_threshold and left_distance > side_threshold and right_distance > side_threshold:
+        w1 = 1
+        w2 = 1
+        w3 = 1
+        w4 = 1
 
-            if random.random() < 0.5:
-                self.left_motor_speed = -0.8
-                self.right_motor_speed = 0.8
-            else:
-                self.left_motor_speed = 0.8
-                self.right_motor_speed = -0.8
-        
-        elif left_distance < side_threshold or right_distance < side_threshold or front_distance < side_threshold:  
-            if left_distance > right_distance:
-                self.left_motor_speed = -0.8
-                self.right_motor_speed = 0.8
-            else:
-                self.left_motor_speed = 0.8
-                self.right_motor_speed = -0.8
-                
-        else:
-            random_turn_chance = 0.01
-            if random.random() < random_turn_chance:
-                if random.random() < 0.5:
-                    self.left_motor_speed = -1.8
-                    self.right_motor_speed = 1.8
-                else:
-                    self.left_motor_speed = 1.8
-                    self.right_motor_speed = -1.8
+
+        rightSpeed = self.right_motor_speed
+        leftSpeed = self.left_motor_speed
+        print(left_distance," ", front_distance," ", right_distance)
+        self.left_motor_speed = self.leftSpeed(w1, w2, w3, w4, sensorVals, leftSpeed)
+        self.right_motor_speed = self.rightSpeed(w1, w2, w3, w4, sensorVals, rightSpeed)
+        self.sensorValues.append(sensorVals)
+        print(self.fitness(self.sensorValues))
 
 
 
