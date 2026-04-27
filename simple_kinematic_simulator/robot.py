@@ -39,14 +39,14 @@ class DifferentialDriveRobot:
         individuals = [N][N]
         for j in range(5):
             for i in range(N):
-                random_int = random.random(0, 0.1)
+                random_int = random.random(-0.1, 0.1)
                 individuals[i][j] = random_int
 
         return individuals
     def evolve():
-        chromosome = [5,5,5,5]
+        chromosome = [0.1,0.1,0.1,0.1]
         return chromosome
-    def fitness(self, sensorVals):
+    def fitness(self):
         fitness = 0
         for i in self.sensorValues:
             fitness = fitness + 1-min(i)
@@ -77,19 +77,19 @@ class DifferentialDriveRobot:
         right_distance, right_color, _ = self.sensors["right"].latest_reading
         sensorVals = self.normalizeSensors([left_distance, front_distance, right_distance])
         
-        w1 = 1
-        w2 = 1
-        w3 = 1
-        w4 = 1
+        w1 = 0.1
+        w2 = 0.1
+        w3 = 0.1
+        w4 = 0.1
 
 
         rightSpeed = self.right_motor_speed
         leftSpeed = self.left_motor_speed
-        print(left_distance," ", front_distance," ", right_distance)
+        #print(left_distance," ", front_distance," ", right_distance)
         self.left_motor_speed = self.leftSpeed(w1, w2, w3, w4, sensorVals, leftSpeed)
         self.right_motor_speed = self.rightSpeed(w1, w2, w3, w4, sensorVals, rightSpeed)
         self.sensorValues.append(sensorVals)
-        print(self.fitness(self.sensorValues))
+        print(self.fitness())
 
 
 
