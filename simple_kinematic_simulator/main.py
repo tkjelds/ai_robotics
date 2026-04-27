@@ -17,12 +17,12 @@ width, height = 1200, 800 # cm
 env = Environment(width, height)
 
 # (simulated) time taken for one cycle of the robot executing its algorithm
-robot_timestep = 0.1 # in seconds (simulated time)
+robot_timestep = 0.05 # in seconds (simulated time)
 
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Robot Kinematic Simulator")
 
-SIM_TIME = 5
+SIM_TIME = 10
 
 def main():
     global USE_VISUALIZATION, PAUSE
@@ -34,7 +34,7 @@ def main():
         start_time = pygame.time.get_ticks()    
         print(x)
         for phenotype in pop:
-            print("current phenotype:", phenotype)
+            #print("current phenotype:", phenotype)
             # robots.append(DifferentialDriveRobot(env,35, 468,-1, weights=phenotype))
             robots.append(DifferentialDriveRobot(env,width/2-100,height/2-100,0, weights=phenotype))
             #robot = DifferentialDriveRobot(env,35, 468,-1, phenotype)
@@ -54,7 +54,7 @@ def main():
             evaluated_phenotypes.append((robot.weights, robot.fitness()))
                 
         pop = evolve(evaluated_phenotypes)
-        print("new population:", pop)
+        #print("new population:", pop)
         
     print("total execution time:", (pygame.time.get_ticks() - start_time) / 1000, "seconds")  # runtime in seconds
 

@@ -15,7 +15,7 @@ class DifferentialDriveRobot:
         self.theta = theta  # Orientation in radians
         self.axel_length = axel_length # in cm
         self.wheel_radius = wheel_radius # in cm
-        print("weight ", weights[1] )
+        #print("weight ", weights[1] )
         self.weights = weights 
         self.w1 = weights[0]
         self.w2 = weights[1]
@@ -51,22 +51,14 @@ class DifferentialDriveRobot:
         for i in self.sensorValues:
             min_val = min(i)
             fitness = fitness + 1-min(i)
-            if min_val < 0.8:
-                fitness - 100
+            if min_val < 0.5:
+                fitness -= 10
+            print("minval: ", min_val)
         return fitness
-    
-    def fitness2(self):
-        min_val = min(self.sensorValues[-1])
-        if min_val < 0.5:
-            return -1
-        else:
-            return min_val
-        
     
     def normalizeSensors(self,sensorVals):
         maxValue = 200
         return [sensorVals[0]/maxValue, sensorVals[1]/maxValue, sensorVals[2]/maxValue, sensorVals[3]/maxValue]
-
 
     def move(self, robot_timestep): # run the control algorithm here
         # simulate kinematics during one execution cycle of the robot
@@ -206,8 +198,10 @@ def evolve(generation):
     newGen = []
     
     # Keep top 50% 
-    sorted_generation = generation.sort(key=lambda x: x[1],reverse=True)        
+    generation.sort(key=lambda x: x[1],reverse=True)        
     maxGen = generation[:5]
+    for i in generation:
+        print(i[1])
     for i in maxGen:
         newGen.append(i[0])
     # Mutate
