@@ -7,8 +7,8 @@ from numpy import cos, sin, pi
 from sensor import SingleRayDistanceAndColorSensor
 
 class DifferentialDriveRobot:
-    sensorValues = []
     def __init__(self, env, x, y, theta, axel_length=40, wheel_radius=10, max_motor_speed=2*pi, kinematic_timestep=0.01, weights = [0.1, 0.1, 0.1, 0.1]):
+        self.sensorValues = []
         self.env = env
         self.x = x
         self.y = y
