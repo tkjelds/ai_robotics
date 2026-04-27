@@ -53,7 +53,6 @@ class DifferentialDriveRobot:
             fitness = fitness + 1-min(i)
             if min_val < 0.5:
                 fitness -= 10
-            print("minval: ", min_val)
         return fitness
     
     def normalizeSensors(self,sensorVals):
@@ -80,23 +79,13 @@ class DifferentialDriveRobot:
         right_distance, right_color, _ = self.sensors["right"].latest_reading
         back_distance, back_color, _ = self.sensors["back"].latest_reading
         sensorVals = self.normalizeSensors([left_distance, front_distance, right_distance, back_distance])
-        
-        # w1 = self.weights[0]    
-        # w2 = self.weights[1]    
-        # w3 = self.weights[2]    
-        # w4 = self.weights[3]    
-        # w2 = 0.1
-        # w3 = 0.1
-        # w4 = 0.1
-
 
         rightSpeed = self.right_motor_speed
         leftSpeed = self.left_motor_speed
-        #print(left_distance," ", front_distance," ", right_distance)
+
         self.left_motor_speed = self.leftSpeed(self.w1, self.w2, self.w3, self.w4, self.w5, sensorVals, leftSpeed)
         self.right_motor_speed = self.rightSpeed(self.w1, self.w2, self.w3, self.w4, self.w5, sensorVals, rightSpeed)
         self.sensorValues.append(sensorVals)
-        # print(self.fitness())
 
 
 
@@ -184,9 +173,9 @@ class RobotPose:
 def generateIndividuals(N):
     #Generate a matrix of integer arrays between 1 and 5
     individuals = []
-    for j in range(N):
+    for _ in range(N):
         weights = []
-        for i in range(5):
+        for _ in range(5):
             weights.append(random.uniform(-1, 1))
             #random_int = random.uniform(-0.1, 0.1)
             # print(i)
@@ -195,13 +184,20 @@ def generateIndividuals(N):
     return individuals
 
 def evolve(generation):
+    if len(generation) == 1:
+        parent = generation[0][0] 
+        newChromosome = []
+        for j in range(len(parent)):
+            mutation = random.uniform(-0.05, 0.05)
+            newChromosome.append(parent[j] + mutation)
+        return [newChromosome]
     newGen = []
     
-    # Keep top 50% 
-    generation.sort(key=lambda x: x[1],reverse=True)        
-    maxGen = generation[:5]
-    for i in generation:
-        print(i[1])
+    generation.sort(key=lambda x: x[1], reverse=True)
+    
+    
+    half = len(generation) // 2
+    maxGen = generation[:half]
     for i in maxGen:
         newGen.append(i[0])
     # Mutate
@@ -210,6 +206,5 @@ def evolve(generation):
         for j in range(5):
             random_int = random.uniform(-0.05, 0.05)
             newChromosome.append(i[0][j] + random_int)
-        # print(newChromosome)
         newGen.append(newChromosome)
     return newGen
