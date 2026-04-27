@@ -12,7 +12,7 @@ USE_VISUALIZATION = False
 
 NUM_EPOCHS_LIST = [1, 5, 10, 20, 30, 40, 50]
 NUM_ROBOTS_LIST = [1, 5, 10, 20, 30, 40, 50]
-RANDOM_SEEDS = [42, 137, 1905, 1927, 314159]
+RANDOM_SEEDS = [1, 2, 3, 4, 5]
 
 NUM_EPOCHS = 5
 NUM_ROBOTS = 1
@@ -40,8 +40,9 @@ def main():
 
     # run_evolutionary_simulation(num_robots=NUM_ROBOTS, num_epochs=NUM_EPOCHS)
     
-    with open("./data/results.jsonl", "a") as f:
-        for num_epochs in NUM_EPOCHS_LIST:
+    # with open("./data/results.jsonl", "a") as f:
+    for num_epochs in NUM_EPOCHS_LIST:
+        with open(f"./data/results_epoch_{num_epochs}.jsonl", "a") as f:
             print(f"Running simulations for num_epochs={num_epochs}...")
             for num_robots in NUM_ROBOTS_LIST:
                 res_list = []
@@ -53,14 +54,20 @@ def main():
                     )
                     res_list.append(res)
                 # calculate average results for this configuration
-                avg_res = {
-                    "num_epochs": num_epochs,
-                    "num_robots": num_robots,
-                    "average_fitness_per_epoch": [average([r["average_fitness_per_epoch"] for r in res_list])],
-                    "min_fitness_per_epoch": [average([r["min_fitness_per_epoch"]for r in res_list])],
-                    "max_fitness_per_epoch": [average([r["max_fitness_per_epoch"] for r in res_list])]
+                avg_res = { 
+                    "num_epochs": num_epochs, 
+                    "num_robots": num_robots, 
+                    "average_fitness_per_epoch": [average([r["average_fitness_per_epoch"][i] for r in res_list]) for i in range(num_epochs)], 
+                    "min_fitness_per_epoch": [average([r["min_fitness_per_epoch"][i] for r in res_list]) for i in range(num_epochs)], 
+                    "max_fitness_per_epoch": [average([r["max_fitness_per_epoch"][i] for r in res_list]) for i in range(num_epochs)],
+                    "max_fitness_overall": average([
+                        r["max_fitness_per_epoch"][-1] for r in res_list
+                    ]),
+                    "min_fitness_overall": average([
+                        r["min_fitness_per_epoch"][-1] for r in res_list
+                    ]),
                 }
-                
+            
                 f.write(json.dumps(avg_res) + "\n")
 
     # Quit Pygame
