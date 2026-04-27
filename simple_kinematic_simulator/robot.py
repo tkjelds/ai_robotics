@@ -1,3 +1,4 @@
+import math
 import random
 
 import pygame
@@ -7,14 +8,21 @@ from sensor import SingleRayDistanceAndColorSensor
 
 class DifferentialDriveRobot:
     sensorValues = []
-    def __init__(self, env, x, y, theta, axel_length=40, wheel_radius=10, max_motor_speed=2*pi, kinematic_timestep=0.01):
+    def __init__(self, env, x, y, theta, axel_length=40, wheel_radius=10, max_motor_speed=2*pi, kinematic_timestep=0.01, weights = [0.1, 0.1, 0.1, 0.1]):
         self.env = env
         self.x = x
         self.y = y
         self.theta = theta  # Orientation in radians
         self.axel_length = axel_length # in cm
         self.wheel_radius = wheel_radius # in cm
-
+        print("weight ", weights[1] )
+        self.weights = weights 
+        self.w1 = weights[0]
+        self.w2 = weights[1]
+        self.w3 = weights[2] 
+        self.w4 = weights[3] 
+        self.w5 = weights[4] 
+        
         self.kinematic_timestep = kinematic_timestep
 
         self.collided = False
@@ -26,36 +34,38 @@ class DifferentialDriveRobot:
         self.sensors = {
             "front": SingleRayDistanceAndColorSensor(200, 0),
             "left": SingleRayDistanceAndColorSensor(200, -0.80),
-            "right": SingleRayDistanceAndColorSensor(200, 0.80)
+            "right": SingleRayDistanceAndColorSensor(200, 0.80),
+            "back": SingleRayDistanceAndColorSensor(200, math.pi)
         }
 
-    def leftSpeed(self,w1, w2, w3, w4, sensorVals, rightSpeed):
-        return w1 * sensorVals[0] + w2 * sensorVals[1] + w3 * sensorVals[2] + w4 * rightSpeed
-    def rightSpeed(self,w1, w2, w3, w4, sensorVals, leftSpeed):
-        return w1 * sensorVals[0] + w2 * sensorVals[1] + w3 * sensorVals[2] + w4 * leftSpeed
+    def leftSpeed(self,w1, w2, w3, w4, w5, sensorVals, rightSpeed):
+        return w1 * sensorVals[0] + w2 * sensorVals[1] + w3 * sensorVals[2] + w4 * sensorVals[3] +  w5 * rightSpeed
+    def rightSpeed(self,w1, w2, w3, w4, w5, sensorVals, leftSpeed):
+        return w1 * sensorVals[0] + w2 * sensorVals[1] + w3 * sensorVals[2] + w4 * sensorVals[3] +  w5  * leftSpeed
 
-    def generateIndividuals(N):
-        #Generate a matrix of integer arrays between 1 and 5
-        individuals = [N][N]
-        for j in range(5):
-            for i in range(N):
-                random_int = random.random(-0.1, 0.1)
-                individuals[i][j] = random_int
 
-        return individuals
-    def evolve():
-        chromosome = [0.1,0.1,0.1,0.1]
-        return chromosome
+    
     def fitness(self):
         fitness = 0
+
         for i in self.sensorValues:
+            min_val = min(i)
             fitness = fitness + 1-min(i)
+            if min_val < 0.8:
+                fitness - 100
         return fitness
+    
+    def fitness2(self):
+        min_val = min(self.sensorValues[-1])
+        if min_val < 0.5:
+            return -1
+        else:
+            return min_val
+        
     
     def normalizeSensors(self,sensorVals):
         maxValue = 200
-        return [sensorVals[0]/maxValue, sensorVals[1]/maxValue, sensorVals[2]/maxValue]
-
+        return [sensorVals[0]/maxValue, sensorVals[1]/maxValue, sensorVals[2]/maxValue, sensorVals[3]/maxValue]
 
 
     def move(self, robot_timestep): # run the control algorithm here
@@ -74,22 +84,27 @@ class DifferentialDriveRobot:
         # Random turn
         front_distance, front_color, _ = self.sensors["front"].latest_reading
         left_distance, left_color, _ = self.sensors["left"].latest_reading
-        right_distance, right_color, _ = self.sensors["right"].latest_reading
-        sensorVals = self.normalizeSensors([left_distance, front_distance, right_distance])
         
-        w1 = 0.1
-        w2 = 0.1
-        w3 = 0.1
-        w4 = 0.1
+        right_distance, right_color, _ = self.sensors["right"].latest_reading
+        back_distance, back_color, _ = self.sensors["back"].latest_reading
+        sensorVals = self.normalizeSensors([left_distance, front_distance, right_distance, back_distance])
+        
+        # w1 = self.weights[0]    
+        # w2 = self.weights[1]    
+        # w3 = self.weights[2]    
+        # w4 = self.weights[3]    
+        # w2 = 0.1
+        # w3 = 0.1
+        # w4 = 0.1
 
 
         rightSpeed = self.right_motor_speed
         leftSpeed = self.left_motor_speed
         #print(left_distance," ", front_distance," ", right_distance)
-        self.left_motor_speed = self.leftSpeed(w1, w2, w3, w4, sensorVals, leftSpeed)
-        self.right_motor_speed = self.rightSpeed(w1, w2, w3, w4, sensorVals, rightSpeed)
+        self.left_motor_speed = self.leftSpeed(self.w1, self.w2, self.w3, self.w4, self.w5, sensorVals, leftSpeed)
+        self.right_motor_speed = self.rightSpeed(self.w1, self.w2, self.w3, self.w4, self.w5, sensorVals, rightSpeed)
         self.sensorValues.append(sensorVals)
-        print(self.fitness())
+        # print(self.fitness())
 
 
 
@@ -119,6 +134,7 @@ class DifferentialDriveRobot:
 
         v_x = cos(self.theta) * (self.wheel_radius * (left_angular_velocity + right_angular_velocity) / 2)
         v_y = sin(self.theta) * (self.wheel_radius * (left_angular_velocity + right_angular_velocity) / 2)
+        
         omega = (self.wheel_radius * (left_angular_velocity - right_angular_velocity)) / self.axel_length
 
         next_x = self.x + (v_x * delta_time)
@@ -172,3 +188,34 @@ class RobotPose:
     # this is for pretty printing
     def __repr__(self) -> str:
         return f"x:{self.x},y:{self.y},theta:{self.theta}"
+
+def generateIndividuals(N):
+    #Generate a matrix of integer arrays between 1 and 5
+    individuals = []
+    for j in range(N):
+        weights = []
+        for i in range(5):
+            weights.append(random.uniform(-1, 1))
+            #random_int = random.uniform(-0.1, 0.1)
+            # print(i)
+        individuals.append(weights)
+
+    return individuals
+
+def evolve(generation):
+    newGen = []
+    
+    # Keep top 50% 
+    sorted_generation = generation.sort(key=lambda x: x[1],reverse=True)        
+    maxGen = generation[:5]
+    for i in maxGen:
+        newGen.append(i[0])
+    # Mutate
+    for i in maxGen:
+        newChromosome = []
+        for j in range(5):
+            random_int = random.uniform(-0.05, 0.05)
+            newChromosome.append(i[0][j] + random_int)
+        # print(newChromosome)
+        newGen.append(newChromosome)
+    return newGen
