@@ -37,12 +37,14 @@ def plot_fitness(
         num_robots = row["num_robots"]
         average_fitness_list = row["average_fitness_per_epoch"]
         max_fitness_list = row["max_fitness_per_epoch"]
+        min_fitness_list = row["min_fitness_per_epoch"]
 
         for epoch, fitness in enumerate(average_fitness_list):
             rows.append({
                 "epoch": epoch + 1 if start_epoch_at_one else epoch,
                 "average_fitness": fitness,
                 "max_fitness": max_fitness_list[epoch],
+                "min_fitness": min_fitness_list[epoch],
                 "num_robots": num_robots
             })
 
@@ -103,13 +105,34 @@ def plot_fitness(
     else:
         plt.close()
         
+    plt.figure(figsize=figsize)
+    
+    sns.lineplot(
+        data=plot_df,
+        x="epoch",
+        y="min_fitness",
+        hue="num_robots",
+        marker="o",
+        hue_order=sorted(plot_df["num_robots"]),
+        legend="full"
+    )
+    
+    plt.title("Min Fitness per Epoch")
+    plt.xlabel("Epoch")
+    plt.ylabel("Min Fitness")
+    plt.legend(title="Number of Robots", fontsize=12, title_fontsize=14)
+    
+    plt.tight_layout()
+    plt.savefig(f"visualisation/plots/min_fitness_{save_name}", dpi=300)
+
+    if show:
+        plt.show()
+    else:
+        plt.close()
+        
         
         
 def plot_max_fitness_overall(filepath, save_name=None, show = False):
-    import json
-    import pandas as pd
-    import seaborn as sns
-    import matplotlib.pyplot as plt
 
     data = []
     with open(filepath, "r") as f:
@@ -141,7 +164,63 @@ def plot_max_fitness_overall(filepath, save_name=None, show = False):
         plt.show()
     else:
         plt.close()
+        
+        
+def make_heat_map():
+    data = []
+    with open("data/results.jsonl", "r") as f:
+        for line in f:
+            data.append(json.loads(line))
+
+    df = pd.DataFrame(data)
+    df_max = df.drop(columns=["average_fitness_per_epoch", "min_fitness_per_epoch", "max_fitness_per_epoch","min_fitness_overall"])
+    df_min = df.drop(columns=["average_fitness_per_epoch", "min_fitness_per_epoch", "max_fitness_per_epoch","max_fitness_overall"])
+
+
+
+    df_max_pivot = df_max.pivot(index="num_epochs", columns="num_robots", values="max_fitness_overall")
+    df_max_pivot = df_max_pivot.iloc[::-1]
+    df_min_pivot = df_min.pivot(index="num_epochs", columns="num_robots", values="min_fitness_overall")
+    df_min_pivot = df_min_pivot.iloc[::-1]
+
+    plt.figure(figsize=(8, 6))
+
+    sns.heatmap(
+        df_max_pivot,
+        annot=True,        
+        fmt=".2f",    
+    )
+
+    plt.xlabel("Number of Epochs")
+    plt.ylabel("Number of Robots")
+    plt.title("Max Fitness Overall Heatmap")
+
+    plt.tight_layout()
     
-for path in datasets:
-    plot_fitness(filepath=path["data"], save_name=path["save_name"])
-    plot_max_fitness_overall(filepath=path["data"], save_name=path["save_name"])
+    plt.savefig(f"visualisation/plots/heat_map_max", dpi=300)
+
+    plt.close()
+
+    plt.figure(figsize=(8, 6))
+
+    sns.heatmap(
+        df_min_pivot,
+        annot=True,        
+        fmt=".2f",
+    )
+
+    plt.xlabel("Number of Epochs")
+    plt.ylabel("Number of Robots")
+    plt.title("Min Fitness Overall Heatmap")
+
+    plt.tight_layout()
+    
+    plt.savefig(f"visualisation/plots/heat_map_min", dpi=300)
+
+    plt.close()
+    
+make_heat_map()
+    
+# for path in datasets:
+#     plot_fitness(filepath=path["data"], save_name=path["save_name"])
+#     plot_max_fitness_overall(filepath=path["data"], save_name=path["save_name"])
